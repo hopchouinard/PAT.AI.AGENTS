@@ -1,0 +1,20 @@
+your_project/
+│
+├── src/
+|   ├── agent_manager.py
+|   ├── config_loader.py
+|   ├── config.yaml
+|   ├── crew_runner.py
+|   ├── logging_config.py
+│   ├── main.py
+│   ├── search_tool.py
+│   ├── sec_tools.py
+|   ├── task_manager.py
+|   ├── utils.py
+│   └── __pycache__/
+│
+├── crew/
+│   ├── financial_analysis_crew.yaml
+│   └── prompt_analysis_crew.yaml
+│
+└── .env

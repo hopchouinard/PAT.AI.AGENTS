@@ -1,0 +1,31 @@
+# General settings
+project_name: "AI Financial Analysis"
+version: "1.0.0"
+
+# LLM settings
+default_llm_model: "llama3:latest"
+
+# API keys (These should be overridden by environment variables)
+sec_api_key: ""
+serper_api_key: ""
+
+# Logging settings
+log_level: "DEBUG"
+log_file_size: 10485760  # 10MB in bytes
+log_backup_count: 5
+
+# Search settings
+search_result_limit: 100  # Number of characters to log from search results
+
+# SEC Tools settings
+sec_form_types:
+  - "10-Q"
+  - "10-K"
+
+# Embedding settings
+embedding_model: "llama3:latest"
+embedding_chunk_size: 1000
+embedding_chunk_overlap: 150
+
+# Crew settings
+default_crew_process: "sequential"
