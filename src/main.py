@@ -1,17 +1,12 @@
-import sys
 import asyncio
 from typing import Dict, List, Any
 from logging_config import setup_logging
 from config_loader import load_crew_config, get_available_crew_configs, setup_environment
-from agent_manager import AgentManager
-from task_manager import create_tasks
-from crew_runner import run_crew
-from dependencies import dependencies
+from containers import container
 from exceptions import (
     ConfigError, APIKeyError, FileNotFoundError, InvalidConfigError,
     AgentCreationError, TaskCreationError, CrewExecutionError, BaseError,
-    AsyncOperationError, NetworkError, TimeoutError, APIError,
-    SECFilingDownloadError, SECFilingParseError, SearchQueryError, SearchResultParseError
+    AsyncOperationError, NetworkError, TimeoutError, APIError
 )
 
 logger = setup_logging()
@@ -19,7 +14,7 @@ logger = setup_logging()
 async def async_main() -> None:
     try:
         # Set up environment
-        setup_environment(dependencies.config)
+        setup_environment(container.config())
 
         # Get available crew configurations
         crew_files: List[str] = get_available_crew_configs()
@@ -41,21 +36,18 @@ async def async_main() -> None:
         # Load the chosen crew configuration
         crew_config: Dict[str, Any] = load_crew_config(chosen_file)
         
-        # Create AgentManager with dependencies
-        agent_manager = AgentManager(
-            dependencies.config,
-            dependencies.ollama_llm,
-            dependencies.search_tool,
-            dependencies.sec_tools
-        )
+        # Get dependencies from the container
+        agent_manager = container.agent_manager()
+        task_manager = container.task_manager()
+        crew_runner = container.crew_runner()
         
         try:
             # Create agents and tasks
             agents: Dict[str, Any] = await agent_manager.create_agents(crew_config)
-            tasks: List[Any] = await create_tasks(crew_config, agents)
+            tasks: List[Any] = await task_manager.create_tasks(crew_config, agents)
             
             # Run the crew
-            result: str = await run_crew(agents, tasks, crew_config.get('process', dependencies.config['default_crew_process']))
+            result: str = await crew_runner.run_crew(agents, tasks, crew_config.get('process', container.config.default_crew_process()))
             
             print("Crew's work result:")
             print(result)
@@ -71,18 +63,6 @@ async def async_main() -> None:
         except APIError as e:
             logger.error(f"API error: {e}")
             print(f"An API error occurred: {e}")
-        except SECFilingDownloadError as e:
-            logger.error(f"SEC filing download error: {e}")
-            print(f"An error occurred while downloading SEC filings: {e}")
-        except SECFilingParseError as e:
-            logger.error(f"SEC filing parse error: {e}")
-            print(f"An error occurred while parsing SEC filings: {e}")
-        except SearchQueryError as e:
-            logger.error(f"Search query error: {e}")
-            print(f"An error occurred while processing the search query: {e}")
-        except SearchResultParseError as e:
-            logger.error(f"Search result parse error: {e}")
-            print(f"An error occurred while parsing search results: {e}")
 
     except ConfigError as e:
         logger.error(f"Configuration error: {e}")
@@ -111,9 +91,6 @@ async def async_main() -> None:
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
         print(f"An unexpected error occurred. Please check the logs for more information.")
-    finally:
-        # Perform any necessary cleanup here
-        pass
 
 def main():
     asyncio.run(async_main())

@@ -4,7 +4,10 @@ your_project/
 |   ├── agent_manager.py
 |   ├── config_loader.py
 |   ├── config.yaml
+|   ├── containers.py
 |   ├── crew_runner.py
+|   ├── dependencies.py
+|   ├── exceptions.py
 |   ├── logging_config.py
 │   ├── main.py
 │   ├── search_tool.py
@@ -13,8 +16,21 @@ your_project/
 |   ├── utils.py
 │   └── __pycache__/
 │
+├── tests/
+│   ├── unit/
+│   │   ├── test_agent_manager.py
+│   │   ├── test_task_manager.py
+│   │   └── test_crew_runner.py
+│   ├── integration/
+│   │   ├── test_sec_tools.py
+│   │   └── test_search_tool.py
+│   ├── e2e/
+│   |   └── test_main.py
+│   └── conftest.py
+│
 ├── crew/
 │   ├── financial_analysis_crew.yaml
 │   └── prompt_analysis_crew.yaml
 │
-└── .env
+├── .env
+└── pytest.ini

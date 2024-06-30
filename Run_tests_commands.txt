@@ -1,0 +1,11 @@
+# Run all tests
+pytest
+
+# Run only unit tests
+pytest tests/unit
+
+# Run only integration tests
+pytest tests/integration
+
+# Run only end-to-end tests
+pytest tests/e2e

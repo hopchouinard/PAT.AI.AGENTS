@@ -21,6 +21,7 @@ search_result_limit: 100  # Number of characters to log from search results
 sec_form_types:
   - "10-Q"
   - "10-K"
+max_concurrent_requests: 5
 
 # Embedding settings
 embedding_model: "llama3:latest"
