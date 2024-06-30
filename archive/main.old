@@ -1,0 +1,129 @@
+import sys
+import os
+import site
+import json
+
+print(f"Python version: {sys.version}")
+print(f"Python executable: {sys.executable}")
+print(f"Site packages: {site.getsitepackages()}")
+
+try:
+    import crewai
+    from crewai import Agent, Task, Crew
+    print("CrewAI imported successfully")
+except ImportError as e:
+    print(f"Error importing CrewAI: {e}")
+    sys.exit(1)
+
+try:
+    from langchain_community.llms import Ollama
+    from langchain.tools import Tool
+    from langchain_community.utilities import GoogleSerperAPIWrapper
+    print("Langchain components imported successfully")
+except ImportError as e:
+    print(f"Error importing Langchain components: {e}")
+    sys.exit(1)
+
+# Set up the Serper API key
+os.environ["SERPER_API_KEY"] = "de026be607468b19d4e7c36a720659bbf50700aa"
+
+# Initialize Ollama with a specific model
+ollama_llm = Ollama(model="llama3:latest")  # You can change this to any model you have in OLLAMA
+
+# Initialize the Serper search tool
+try:
+    search = GoogleSerperAPIWrapper()
+    def search_tool(*args, **kwargs):
+        # Extract the query from args or kwargs
+        if args:
+            query = args[0]
+        elif kwargs:
+            query = kwargs.get('query', '')
+        else:
+            query = ''
+        
+        # Handle different input types
+        if isinstance(query, dict):
+            actual_query = query.get('query', '')
+        elif isinstance(query, str):
+            try:
+                # Try to parse as JSON
+                query_dict = json.loads(query)
+                actual_query = query_dict.get('query', query)
+            except json.JSONDecodeError:
+                # If not JSON, use the string as is
+                actual_query = query
+        else:
+            actual_query = str(query)
+        
+        return search.run(actual_query)
+    
+    search_tool = Tool(
+        name="Search",
+        func=search_tool,
+        description="Search the internet for current information. Input should be a string containing the search query."
+    )
+    print("Search tool created successfully")
+except Exception as e:
+    print(f"Error creating search tool: {e}")
+    sys.exit(1)
+
+# Create two agents using Ollama
+researcher = Agent(
+    role='Researcher',
+    goal='Find the latest information on AI advancements',
+    backstory="You are an AI research expert always looking for the latest breakthroughs.",
+    verbose=True,
+    allow_delegation=False,
+    tools=[search_tool],
+    llm=ollama_llm
+)
+
+writer = Agent(
+    role='Tech Writer',
+    goal='Write engaging articles about AI advancements',
+    backstory="You are a tech enthusiast who loves explaining complex AI concepts in simple terms.",
+    verbose=True,
+    allow_delegation=False,
+    llm=ollama_llm
+)
+
+# Create tasks for each agent
+try:
+    research_task = Task(
+        description="Research the latest advancements in generative AI tools and models",
+        agent=researcher,
+        expected_output="A comprehensive list of recent generative AI tools and models advancements with brief descriptions"
+    )
+    print("Research task created successfully")
+except Exception as e:
+    print(f"Error creating research task: {e}")
+
+try:
+    writing_task = Task(
+        description="Write a 2-paragraph summary for each of the news items or advancements listed by the researcher. Each summary should provide an overview of the tool or trend and its potential impact or applications.",
+        agent=writer,
+        expected_output="A series of 2-paragraph summaries, one for each major advancement or tool in generative AI identified by the researcher."
+    )
+    print("Writing task created successfully")
+except Exception as e:
+    print(f"Error creating writing task: {e}")
+
+# Create a crew with both agents and their tasks
+try:
+    crew = Crew(
+        agents=[researcher, writer],
+        tasks=[research_task, writing_task],
+        verbose=2
+    )
+    print("Crew created successfully")
+except Exception as e:
+    print(f"Error creating crew: {e}")
+
+# Start the crew's work
+try:
+    result = crew.kickoff()
+    print("Crew's work result:")
+    print(result)
+except Exception as e:
+    print(f"Error during crew kickoff: {e}")

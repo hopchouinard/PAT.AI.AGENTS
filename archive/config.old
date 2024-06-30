@@ -1,0 +1,51 @@
+llm_model: "llama3:latest"
+
+agents:
+  - name: researcher
+    role: 'Researcher'
+    goal: 'Find the latest information on AI advancements'
+    backstory: "You are an AI research expert always looking for the latest breakthroughs."
+    verbose: true
+    allow_delegation: false
+    use_search_tool: true
+
+  - name: writer
+    role: 'Tech Writer'
+    goal: 'Write engaging articles about AI advancements'
+    backstory: "You are a tech enthusiast who loves explaining complex AI concepts in simple terms."
+    verbose: true
+    allow_delegation: false
+    use_search_tool: false
+
+  - name: analyst
+    role: 'Data Analyst'
+    goal: 'Analyze trends and patterns in AI research'
+    backstory: "You are a data expert who excels at identifying emerging trends in technology."
+    verbose: true
+    allow_delegation: false
+    use_search_tool: true
+
+  - name: editor
+    role: 'Content Editor'
+    goal: 'Refine and polish AI-related content for publication'
+    backstory: "You are an experienced editor with a keen eye for detail and a passion for clear communication."
+    verbose: true
+    allow_delegation: false
+    use_search_tool: false
+
+tasks:
+  - description: "Research the latest advancements in generative AI tools and models"
+    agent: researcher
+    expected_output: "A comprehensive list of recent generative AI tools and models advancements with brief descriptions"
+
+  - description: "Write a 2-paragraph summary for each of the news items or advancements listed by the researcher. Each summary should provide an overview of the tool or trend and its potential impact or applications."
+    agent: writer
+    expected_output: "A series of 2-paragraph summaries, one for each major advancement or tool in generative AI identified by the researcher."
+
+  - description: "Analyze the research findings to identify the top 3 emerging trends in AI and provide supporting data points."
+    agent: analyst
+    expected_output: "A report outlining the top 3 emerging AI trends with supporting data and analysis."
+
+  - description: "Review and edit the writer's summaries and the analyst's report, ensuring clarity, coherence, and a consistent style throughout."
+    agent: editor
+    expected_output: "A polished, final version of the AI advancements article and trends report, ready for publication."

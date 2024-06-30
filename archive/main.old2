@@ -1,0 +1,129 @@
+import yaml
+import os
+import sys
+import logging
+from crewai import Agent, Task, Crew
+from langchain_community.llms import Ollama
+from search_tool import create_search_tool
+from sec_tools import SECTools
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Construct the full path to config.yaml
+config_path = os.path.join(script_dir, 'config.yaml')
+
+# Load configuration from YAML file
+try:
+    with open(config_path, 'r') as file:
+        config = yaml.safe_load(file)
+    print("YAML file content:")
+    print(config)
+    if config is None:
+        print("Warning: YAML file is empty or not properly formatted")
+except FileNotFoundError:
+    print(f"Error: config.yaml not found at {config_path}")
+    print("Current working directory:", os.getcwd())
+    print("Contents of script directory:")
+    print(os.listdir(script_dir))
+    raise
+except yaml.YAMLError as e:
+    print(f"Error parsing YAML file: {e}")
+    raise
+
+# Check if config is None before proceeding
+if config is None:
+    raise ValueError("Config is None. Please check your YAML file.")
+
+# Set up the Serper API key
+os.environ["SERPER_API_KEY"] = "de026be607468b19d4e7c36a720659bbf50700aa"
+
+# Set up the SEC API key
+os.environ['SEC_API_API_KEY'] = 'e4c0a08d143631e9ba3cadef84b1cd1799e9659ac2487068516cb38f2c32e787'
+
+# Initialize Ollama with a specific model
+ollama_llm = Ollama(model="llama3:latest") 
+
+# Get company name from user input
+company_name = input("Enter the company name for analysis: ")
+
+# Initialize the Serper search tool
+try:
+    search_tool = create_search_tool()
+    logger.info("Search tool created successfully")
+except Exception as e:
+    logger.error(f"Error creating search tool: {e}")
+    sys.exit(1)
+    
+# Initialize the Sec analysis tool
+try:
+    search_tool = create_search_tool()
+    logger.info("Search tool created successfully")
+except Exception as e:
+    logger.error(f"Error creating search tool: {e}")
+    sys.exit(1)
+    
+# Initialize the Serper search tool
+try:
+    search_tool = create_search_tool()
+    logger.info("Search tool created successfully")
+except Exception as e:
+    logger.error(f"Error creating search tool: {e}")
+    sys.exit(1)
+
+# Initialize SEC tools
+sec_tools = [
+    SECTools.search_10q,
+    SECTools.search_10k
+]
+
+# Create agents dynamically
+agents = {}
+for agent_config in config['agents']:
+    tools = []
+    if agent_config.get('use_search_tool', False):
+        tools.append(search_tool)
+    if agent_config.get('use_sec_tools', False):
+        tools.extend(sec_tools)
+    
+    agents[agent_config['name']] = Agent(
+        role=agent_config['role'],
+        goal=agent_config['goal'],
+        backstory=agent_config['backstory'],
+        verbose=agent_config.get('verbose', True),
+        allow_delegation=agent_config.get('allow_delegation', False),
+        tools=tools,
+        llm=ollama_llm
+    )
+    logger.info(f"Agent created: {agent_config['name']} with tools: {[tool.name for tool in tools]}")
+
+# Create tasks dynamically
+tasks = []
+for task_config in config['tasks']:
+    task_description = task_config['description'].format(company_name=company_name)
+    tasks.append(Task(
+        description=task_description,
+        agent=agents[task_config['agent']],
+        expected_output=task_config['expected_output']
+    ))
+    logger.info(f"Task created: {task_description[:50]}...")
+
+# Create crew
+crew = Crew(
+    agents=list(agents.values()),
+    tasks=tasks,
+    verbose=2
+)
+
+# Start the crew's work
+try:
+    result = crew.kickoff()
+    logger.info("Crew's work completed successfully")
+    print("Crew's work result:")
+    print(result)
+except Exception as e:
+    logger.error(f"Error during crew kickoff: {e}")

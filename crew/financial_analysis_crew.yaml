@@ -1,0 +1,31 @@
+name: financial_analysis_crew
+llm_model: "llama3:latest"
+
+agents:
+  company_researcher:
+    role: 'Financial Researcher'
+    goal: 'Gather all of the necessary financial information, using search tools, about a company for the financial analyst to prepare a report.'
+    backstory: "An expert financial researcher, who spends all day and night thinking about financial performance of different companies."
+    verbose: true
+    allow_delegation: false
+    use_search_tool: true
+    use_sec_tools: true
+
+  company_analyst:
+    role: 'Financial Analyst'
+    goal: 'Take provided company financial information and create a thorough financial report about a given company.'
+    backstory: "An expert financial analyst who prides themselves on creating clear and easily readable financial reports of different companies."
+    verbose: true
+    allow_delegation: false
+    use_search_tool: false
+    use_sec_tools: true
+
+tasks:
+  - description: "Use a search tool to look up this company's stock information: {company_name}. The goal is to prepare enough information to make an informed analysis of the company's stock performance."
+    agent: company_researcher
+    expected_output: "All of the relevant financial information about the company's stock performance."
+  - description: "Take {company_name}'s financial information, analyze it, and provide a financial analysis, including: Profitability ratio, Liquidity ratios, Solvency ratios, Efficiency ratios, Growth metrics, Valuation metrics, and Cash flow metrics."
+    agent: company_analyst
+    expected_output: "A nicely formatted analysis including all of the financial metrics necessary for a thorough financial analysis of a company."
+
+process: sequential
