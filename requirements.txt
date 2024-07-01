@@ -1,0 +1,16 @@
+crewai
+langchain
+langchain_community
+pydantic
+structlog
+PyYAML
+python-dotenv
+aiohttp
+sec_api
+unstructured
+faiss-cpu
+dependency_injector
+pytest
+black
+flake8
+mypy
