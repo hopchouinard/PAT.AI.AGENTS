@@ -1,6 +1,6 @@
 from pydantic import BaseSettings, Field, SecretStr, validator
 from typing import List
-import os
+
 
 class AppConfig(BaseSettings):
     # LLM settings
@@ -16,22 +16,32 @@ class AppConfig(BaseSettings):
     log_backup_count: int = Field(5, description="Number of log files to keep")
 
     # Search settings
-    search_result_limit: int = Field(100, description="Number of characters to log from search results")
+    search_result_limit: int = Field(
+        100, description="Number of characters to log from search results"
+    )
 
     # SEC Tools settings
-    sec_form_types: List[str] = Field(["10-Q", "10-K"], description="SEC form types to search")
+    sec_form_types: List[str] = Field(
+        ["10-Q", "10-K"], description="SEC form types to search"
+    )
 
     # Embedding settings
     embedding_model: str = Field("llama3:latest", description="Embedding model to use")
-    embedding_chunk_size: int = Field(1000, ge=1, description="Chunk size for embeddings")
-    embedding_chunk_overlap: int = Field(150, ge=0, description="Chunk overlap for embeddings")
+    embedding_chunk_size: int = Field(
+        1000, ge=1, description="Chunk size for embeddings"
+    )
+    embedding_chunk_overlap: int = Field(
+        150, ge=0, description="Chunk overlap for embeddings"
+    )
 
     # Crew settings
-    default_crew_process: str = Field("sequential", description="Default process for crew execution")
+    default_crew_process: str = Field(
+        "sequential", description="Default process for crew execution"
+    )
 
-    @validator('log_level')
+    @validator("log_level")
     def log_level_must_be_valid(cls, v):
-        valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
             raise ValueError(f"Log level must be one of {valid_levels}")
         return v.upper()
@@ -40,8 +50,10 @@ class AppConfig(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
+
 def load_config() -> AppConfig:
     return AppConfig()
+
 
 # Global config object
 config = load_config()

@@ -5,20 +5,20 @@ from exceptions import CrewExecutionError
 
 logger = setup_logging()
 
+
 class CrewRunner:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
 
-    async def run_crew(self, agents: Dict[str, Agent], tasks: List[Task], process: str) -> str:
-        """Set up and run the crew with given agents and tasks asynchronously."""
+    async def run_crew(
+        self, agents: Dict[str, Agent], tasks: List[Task], process: str
+    ) -> str:
+        """Set up and run the crew with given agents and tasks."""
         try:
             crew = Crew(
-                agents=list(agents.values()),
-                tasks=tasks,
-                verbose=2,
-                process=process
+                agents=list(agents.values()), tasks=tasks, verbose=2, process=process
             )
-            
+
             logger.info("Starting crew execution")
             result: str = await crew.kickoff()
             logger.info("Crew execution completed successfully")
