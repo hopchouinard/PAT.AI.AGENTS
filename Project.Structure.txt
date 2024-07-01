@@ -3,10 +3,12 @@ your_project/
 ├── src/
 |   ├── agent_manager.py
 |   ├── config_loader.py
+|   ├── config.py
 |   ├── config.yaml
 |   ├── containers.py
 |   ├── crew_runner.py
 |   ├── dependencies.py
+|   ├── error_handling.py
 |   ├── exceptions.py
 |   ├── logging_config.py
 │   ├── main.py
@@ -33,4 +35,8 @@ your_project/
 │   └── prompt_analysis_crew.yaml
 │
 ├── .env
+├── .flake8
+├── lint.py
+├── mypy.ini
+├── pyproject.toml
 └── pytest.ini
