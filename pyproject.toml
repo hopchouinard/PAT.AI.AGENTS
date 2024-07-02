@@ -1,17 +1,33 @@
-[tool.black]
-line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+[tool.poetry]
+name = "pat-ai-agents"
+version = "0.1.0"
+description = "Dynamic management of AI agents and tasks"
+authors = ["Patrick CHouinard <patrick.chouinard@ivanhoecambridge.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+crewai = "^0.35.3"
+langchain = ">=0.2.6,<0.3.0"
+langchain-community = "^0.2.6"
+pydantic = "^2.7.4"
+pydantic-settings = "^2.3.4"
+structlog = "^24.2.0"
+pyyaml = "^6.0.1"
+python-dotenv = "^1.0.1"
+aiohttp = "^3.9.5"
+sec-api = "^1.0.18"
+psutil = "^6.0.0"
+unstructured = "^0.14.9"
+faiss-cpu = "^1.8.0.post1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+black = "^24.4.2"
+flake8 = "^7.1.0"
+mypy = "^1.10.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
