@@ -1,10 +1,12 @@
-from pydantic import BaseSettings, Field, SecretStr, validator
+from pydantic_settings import BaseSettings
+from pydantic import Field, SecretStr, validator
+from pydantic import Field, SecretStr, validator
 from typing import List
 
 
 class AppConfig(BaseSettings):
     # LLM settings
-    default_llm_model: str = Field(..., description="Default LLM model to use")
+    default_llm_model: str = Field("llama3:latest", description="Default LLM model to use")
 
     # API keys
     sec_api_key: SecretStr = Field(..., description="SEC API key")
@@ -26,13 +28,9 @@ class AppConfig(BaseSettings):
     )
 
     # Embedding settings
-    embedding_model: str = Field("llama3:latest", description="Embedding model to use")
-    embedding_chunk_size: int = Field(
-        1000, ge=1, description="Chunk size for embeddings"
-    )
-    embedding_chunk_overlap: int = Field(
-        150, ge=0, description="Chunk overlap for embeddings"
-    )
+    embedding_model: str = Field("llama2", description="Embedding model to use")
+    embedding_chunk_size: int = Field(1000, ge=1, description="Chunk size for embeddings")
+    embedding_chunk_overlap: int = Field(200, ge=0, description="Chunk overlap for embeddings")
 
     # Crew settings
     default_crew_process: str = Field(

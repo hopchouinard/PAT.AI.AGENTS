@@ -24,11 +24,13 @@ class SECTools:
 
     @tool("Search 10-Q form")
     async def search_10q(self, query: str) -> str:
+        """This method searches for 10-Q forms."""
         logger.debug(f"Searching 10-Q form with query: {query}")
         return await self._search_filing(query, "10-Q")
 
     @tool("Search 10-K form")
     async def search_10k(self, query: str) -> str:
+        """This method searches for 10-K forms."""
         logger.debug(f"Searching 10-K form with query: {query}")
         return await self._search_filing(query, "10-K")
 

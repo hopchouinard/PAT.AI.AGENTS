@@ -3,7 +3,7 @@ from crewai import Agent
 from langchain_community.llms import Ollama
 from logging_config import LoggerMixin, log_execution_time
 from exceptions import AgentCreationError
-
+from embedding_manager import EmbeddingManager
 
 class AgentManager(LoggerMixin):
     def __init__(
@@ -12,11 +12,13 @@ class AgentManager(LoggerMixin):
         ollama_llm: Ollama,
         search_tool: Any,
         sec_tools: Any,
+        embedding_manager: EmbeddingManager,
     ) -> None:
         self.config: Dict[str, Any] = config
         self.ollama_llm: Ollama = ollama_llm
         self.search_tool: Any = search_tool
         self.sec_tools: Any = sec_tools
+        self.embedding_manager: EmbeddingManager = embedding_manager
 
     @log_execution_time(logger=None)
     async def create_agents(self, crew_config: Dict[str, Any]) -> Dict[str, Agent]:
@@ -39,6 +41,8 @@ class AgentManager(LoggerMixin):
                     allow_delegation=agent_config.get("allow_delegation", False),
                     tools=tools,
                     llm=self.ollama_llm,
+                    # Use a custom memory implementation if needed
+                    # memory=CustomMemory(self.embedding_manager),
                 )
                 self.logger.info("Agent created", agent_name=agent_name)
             except KeyError as e:
